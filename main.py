@@ -42,28 +42,29 @@ def get_race(race_id):
     
     ## 1着〜3着までの馬番の人気を取得
     NUM_RANK_DICT = {}
-    RANK_1_TO_4_LIST = []
+    RANK_1_TO_3_LIST = []
     for row in race_info.itertuples():
         print(row[3], row[11])
         NUM_RANK_DICT[int(row[3])] = int(row[11])
-        if len(RANK_1_TO_4_LIST) < 3:
-            RANK_1_TO_4_LIST.append(row[11])
+        if len(RANK_1_TO_3_LIST) < 3:
+            RANK_1_TO_3_LIST.append(row[11])
     
-    print(f"RANK_1_TO_4_LIST : {RANK_1_TO_4_LIST}")
-    
-    
-    
+    result_safe = True
+    for rk in RANK_1_TO_3_LIST:
+        if rk > 4:
+            result_safe = False
+            break
     
     odds = pd.concat([odds_1,odds_2])
     
     # print(race_info)
-    print(odds)
+    # print(odds)
     
     # 3連単の馬順のみを取得
     three_part_unit = str(odds.iat[6,1])
     three_part_unit_odds = int(odds.iat[6,2])
     three_part_unit = three_part_unit.split("→")
-    
+    print(f"[[ {result_safe} ]] {RANK_1_TO_3_LIST}  >>> ODDS : {three_part_unit_odds}円")
     
     race_info.to_csv('/Users/sirius1000/keiba/scraping/csv/sample_pandas_normal2.csv')
     odds.to_csv('/Users/sirius1000/keiba/scraping/csv/sample_pandas_normal.csv')
