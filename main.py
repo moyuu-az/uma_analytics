@@ -40,22 +40,29 @@ def get_race(race_id):
     odds_2 = pd.read_html(url)[2]
     
     
+    ## 1着〜3着までの馬番の人気を取得
+    NUM_RANK_DICT = {}
+    RANK_1_TO_4_LIST = []
+    for row in race_info.itertuples():
+        print(row[3], row[11])
+        NUM_RANK_DICT[int(row[3])] = int(row[11])
+        if len(RANK_1_TO_4_LIST) < 3:
+            RANK_1_TO_4_LIST.append(row[11])
     
+    print(f"RANK_1_TO_4_LIST : {RANK_1_TO_4_LIST}")
     
     
     
     
     odds = pd.concat([odds_1,odds_2])
     
-    print(race_info)
+    # print(race_info)
     print(odds)
     
     # 3連単の馬順のみを取得
     three_part_unit = str(odds.iat[6,1])
     three_part_unit_odds = int(odds.iat[6,2])
     three_part_unit = three_part_unit.split("→")
-    
-    
     
     
     race_info.to_csv('/Users/sirius1000/keiba/scraping/csv/sample_pandas_normal2.csv')
