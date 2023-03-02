@@ -21,7 +21,6 @@ CODE_LIST = {
     "10" : "小倉"
 }
 
-
 def parse_id(race_id):
     year = race_id[:4]
     course_code = race_id[4:6]
@@ -40,13 +39,26 @@ def get_race(race_id):
     odds_1 = pd.read_html(url)[1]
     odds_2 = pd.read_html(url)[2]
     
-    # print(odds_1,odds_2)
+    
+    
+    
+    
+    
     
     odds = pd.concat([odds_1,odds_2])
     
+    print(race_info)
     print(odds)
     
-    # df.to_csv('/Users/sirius1000/keiba/scraping/csv/sample_pandas_normal.csv')
+    # 3連単の馬順のみを取得
+    three_part_unit = str(odds.iat[6,1])
+    three_part_unit_odds = int(odds.iat[6,2])
+    three_part_unit = three_part_unit.split("→")
+    
+    
+    
+    
+    race_info.to_csv('/Users/sirius1000/keiba/scraping/csv/sample_pandas_normal2.csv')
     odds.to_csv('/Users/sirius1000/keiba/scraping/csv/sample_pandas_normal.csv')
 
 def get_race_name(race_url):
@@ -77,6 +89,7 @@ def main():
     race_id_list = gen_race_id()
     for ril in race_id_list:
         get_race(ril)
+        break
 
 if __name__ == "__main__":
     main()
