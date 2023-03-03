@@ -44,10 +44,13 @@ def get_race(race_id):
     NUM_RANK_DICT = {}
     RANK_1_TO_3_LIST = []
     for row in race_info.itertuples():
-        print(row[3], row[11])
-        NUM_RANK_DICT[int(row[3])] = int(row[11])
-        if len(RANK_1_TO_3_LIST) < 3:
-            RANK_1_TO_3_LIST.append(row[11])
+        try:
+            if row[11] != "NaN":
+                NUM_RANK_DICT[int(row[3])] = int(row[11])
+                if len(RANK_1_TO_3_LIST) < 3:
+                    RANK_1_TO_3_LIST.append(row[11])
+        except:
+            pass
     
     result_safe = True
     for rk in RANK_1_TO_3_LIST:
@@ -65,17 +68,21 @@ def get_race(race_id):
     three_part_unit_odds = int(odds.iat[6,2])
     three_part_unit = three_part_unit.split("→")
     print(f"[[ {result_safe} ]] {RANK_1_TO_3_LIST}  >>> ODDS : {three_part_unit_odds}円")
-    
-    race_info.to_csv('/Users/sirius1000/keiba/scraping/csv/sample_pandas_normal2.csv')
-    odds.to_csv('/Users/sirius1000/keiba/scraping/csv/sample_pandas_normal.csv')
+    return result_safe,three_part_unit_odds
+    # race_info.to_csv('/Users/sirius1000/keiba/scraping/csv/sample_pandas_normal2.csv')
+    # odds.to_csv('/Users/sirius1000/keiba/scraping/csv/sample_pandas_normal.csv')
 
 def get_race_name(race_url):
-    html = urllib.request.urlopen(race_url).read()
-    root = BeautifulSoup(html, 'lxml')
-    race_dict = {}
-    race_dict['race_title'] = root.find('dl', class_='racedata fc').dd.h1.contents[0]
-    print(race_dict)
-    return race_dict['race_title']
+    try:
+        html = urllib.request.urlopen(race_url).read()
+        root = BeautifulSoup(html, 'lxml')
+        race_dict = {}
+        race_dict['race_title'] = root.find('dl', class_='racedata fc').dd.h1.contents[0]
+        print(race_dict)
+        return race_dict['race_title']
+    except:
+        return "ERROR"
+    
     
 def gen_race_id():
     race_id_list = []
@@ -94,10 +101,31 @@ def gen_race_id():
     return race_id_list
 
 def main():
+    PAY_NUM = 3600
+    
     race_id_list = gen_race_id()
-    for ril in race_id_list:
-        get_race(ril)
-        break
-
+    count = 0
+    get_odds = 0
+    pay = 0
+    for index, ril in enumerate(race_id_list):
+        try:
+            print("========")
+            count += 1
+            result_safe,three_part_unit_odds = get_race(ril)
+            if result_safe:
+                get_odds += three_part_unit_odds
+            print(f"""
+            count : {count}回 , 獲得金額 : {get_odds}円 , 収支 : {get_odds - count*PAY_NUM} 割合 : {get_odds / (get_odds - count*PAY_NUM) * 100}
+            """)
+        except KeyboardInterrupt:
+            print("bye")
+        except:
+            pass
+    
+    ALL_PAYED = PAY_NUM * count
+    print(f"""
+        count : {count}回 , 獲得金額 : {get_odds}円 , 収支 : {get_odds - ALL_PAYED}
+        """)
+    
 if __name__ == "__main__":
     main()
